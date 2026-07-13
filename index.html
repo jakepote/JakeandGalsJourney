@@ -58,19 +58,82 @@
             z-index: 1;
         }
 
+        /* WAVY GRASS HILLS */
         .grass {
             position: absolute;
             bottom: 0;
             width: 100%;
             height: 35%;
-            background: repeating-linear-gradient(
-                90deg,
-                #3da66f 0px,
-                #3da66f 40px,
-                #35945a 40px,
-                #35945a 80px
-            );
+            background: linear-gradient(to bottom, #3da66f, #35945a);
             z-index: 2;
+            clip-path: polygon(
+                0% 100%,
+                0% 70%,
+                2% 65%,
+                4% 62%,
+                6% 65%,
+                8% 70%,
+                10% 75%,
+                12% 72%,
+                14% 65%,
+                16% 60%,
+                18% 65%,
+                20% 75%,
+                22% 80%,
+                24% 75%,
+                26% 65%,
+                28% 58%,
+                30% 65%,
+                32% 75%,
+                34% 82%,
+                36% 78%,
+                38% 68%,
+                40% 60%,
+                42% 65%,
+                44% 75%,
+                46% 80%,
+                48% 75%,
+                50% 65%,
+                52% 58%,
+                54% 65%,
+                56% 75%,
+                58% 80%,
+                60% 75%,
+                62% 68%,
+                64% 60%,
+                66% 65%,
+                68% 75%,
+                70% 80%,
+                72% 75%,
+                74% 65%,
+                76% 58%,
+                78% 65%,
+                80% 75%,
+                82% 80%,
+                84% 75%,
+                86% 68%,
+                88% 60%,
+                90% 65%,
+                92% 75%,
+                94% 80%,
+                96% 75%,
+                98% 70%,
+                100% 75%,
+                100% 100%
+            );
+        }
+
+        /* PATH */
+        .path {
+            position: absolute;
+            bottom: 35%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 300px;
+            background: linear-gradient(90deg, transparent 20%, rgba(139, 90, 43, 0.6) 50%, transparent 80%);
+            z-index: 2.5;
+            border-radius: 60px;
         }
 
         /* MAIN GAME AREA */
@@ -91,6 +154,12 @@
             align-items: flex-end;
             animation: walk 3s ease-in-out infinite;
             margin-bottom: 60px;
+            transition: margin-bottom 1.5s ease-in-out;
+        }
+
+        .characters.moving {
+            animation: none;
+            margin-bottom: 200px;
         }
 
         @keyframes walk {
@@ -262,7 +331,7 @@
             bottom: 150px;
             right: 10%;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.3s ease;
             z-index: 4;
         }
 
@@ -270,17 +339,22 @@
             transform: scale(1.1);
         }
 
-        .stopping-point img {
-            max-width: 150px;
-            height: auto;
+        .stopping-point-image {
+            width: 150px;
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
             border: 3px solid #ffd700;
+            background: #333;
+            font-size: 60px;
+            margin-bottom: 8px;
         }
 
         .point-label {
             text-align: center;
-            margin-top: 8px;
             font-size: 12px;
             color: #ffd700;
             font-weight: bold;
@@ -544,9 +618,10 @@
         <div class="sky day" id="sky"></div>
         <div class="ground"></div>
         <div class="grass"></div>
+        <div class="path"></div>
         
         <div class="game-area">
-            <div class="characters">
+            <div class="characters" id="characters">
                 <!-- Jake with brown hair -->
                 <div class="character">
                     <div class="character-sprite jake">
@@ -579,7 +654,7 @@
             </div>
 
             <div class="stopping-point" id="stoppingPoint" onclick="arriveAtStop()">
-                <img id="stopImage" src="https://via.placeholder.com/150?text=Memory" alt="Memory Location">
+                <div class="stopping-point-image" id="stopImage">📍</div>
                 <div class="point-label" id="stopLabel">Next Stop</div>
             </div>
         </div>
@@ -617,7 +692,7 @@
                 date: "April 18, 2026",
                 description: "The day we first met at Hurricane Harry's. A moment that changed everything. 🌟",
                 location: "Hurricane Harry's",
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%238B4513' width='200' height='200'/%3E%3Crect fill='%23A0522D' x='20' y='40' width='160' height='120'/%3E%3Crect fill='%23654321' x='50' y='80' width='40' height='60'/%3E%3C/svg%3E",
+                emoji: "🏗️",
                 sky: "night",
                 game: "tic-tac-toe"
             },
@@ -627,7 +702,7 @@
                 date: "April 20, 2026",
                 description: "Mini golf and laughs. You made me smile the entire time. ⛳💕",
                 location: "Pop Stroke Mini Golf",
-                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%2390EE90' width='200' height='200'/%3E%3Ccircle cx='100' cy='100' r='20' fill='%23FFD700'/%3E%3Crect fill='%238B0000' x='80' y='120' width='40' height='30'/%3E%3C/svg%3E",
+                emoji: "⛳",
                 sky: "day",
                 game: "memory-match"
             }
@@ -655,8 +730,8 @@
             // Update sky
             document.getElementById('sky').className = 'sky ' + memory.sky;
             
-            // Update stopping point
-            document.getElementById('stopImage').src = memory.image;
+            // Update stopping point with emoji
+            document.getElementById('stopImage').textContent = memory.emoji;
             document.getElementById('stopLabel').textContent = memory.location;
             
             // Show UI panel
@@ -677,13 +752,19 @@
         }
 
         function arriveAtStop() {
-            // Animation could go here
             console.log('Arrived at stop ' + (currentStop + 1));
         }
 
         function nextStop() {
             if (currentStop < memories.length - 1) {
-                loadStop(currentStop + 1);
+                // Add movement animation
+                const chars = document.getElementById('characters');
+                chars.classList.add('moving');
+                
+                setTimeout(() => {
+                    loadStop(currentStop + 1);
+                    chars.classList.remove('moving');
+                }, 1500);
             }
         }
 
