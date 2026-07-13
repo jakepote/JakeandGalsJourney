@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jake and Galilee's Journey</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* SKY */
+        .sky {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 60%;
+            transition: background 2s ease-in-out;
+            z-index: 0;
+        }
+
+        .sky.night {
+            background: linear-gradient(to bottom, #0a0e27, #1a1a3a);
+        }
+
+        .sky.day {
+            background: linear-gradient(to bottom, #87ceeb, #e0f6ff);
+        }
+
+        .sky.sunset {
+            background: linear-gradient(to bottom, #ff6b35, #ffa366, #ffe0b3);
+        }
+
+        /* GROUND */
+        .ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 40%;
+            background: linear-gradient(to bottom, #2d8659, #1a5033);
+            z-index: 1;
+        }
+
+        .grass {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 35%;
+            background: repeating-linear-gradient(
+                90deg,
+                #3da66f 0px,
+                #3da66f 40px,
+                #35945a 40px,
+                #35945a 80px
+            );
+            z-index: 2;
+        }
+
+        /* MAIN GAME AREA */
+        .game-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 3;
+        }
+
+        /* CHARACTERS */
+        .characters {
+            display: flex;
+            gap: 30px;
+            align-items: flex-end;
+            animation: walk 3s ease-in-out infinite;
+            margin-bottom: 80px;
+        }
+
+        @keyframes walk {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .character {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .character-sprite {
+            width: 60px;
+            height: 80px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-size: 50px;
+        }
+
+        .character-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* STOPPING POINT */
+        .stopping-point {
+            position: absolute;
+            bottom: 150px;
+            right: 10%;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+            z-index: 4;
+        }
+
+        .stopping-point:hover {
+            transform: scale(1.1);
+        }
+
+        .stopping-point img {
+            max-width: 150px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border: 3px solid #ffd700;
+        }
+
+        .point-label {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #ffd700;
+            font-weight: bold;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+        }
+
+        /* UI PANEL */
+        .ui-panel {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 500px;
+            z-index: 10;
+            border: 2px solid #ffd700;
+        }
+
+        .memory-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .memory-date {
+            font-size: 14px;
+            color: #ccc;
+            margin-bottom: 10px;
+        }
+
+        .memory-description {
+            font-size: 16px;
+            color: white;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .btn-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #ffed4e;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        /* MODAL */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(0, 0, 0, 0.95);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 3px solid #ffd700;
+            color: white;
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            gap: 5px;
+            margin: 20px auto;
+        }
+
+        .game-cell {
+            width: 100px;
+            height: 100px;
+            background: #ffd700;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+        }
+
+        .game-cell:hover {
+            background: #ffed4e;
+        }
+
+        .game-cell:disabled {
+            cursor: not-allowed;
+        }
+
+        .game-status {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 18px;
+            color: #ffd700;
+        }
+
+        .memory-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .memory-card {
+            width: 100%;
+            aspect-ratio: 1;
+            background: #444;
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:hover {
+            background: #555;
+            transform: scale(1.05);
+        }
+
+        .memory-card.matched {
+            background: #4CAF50;
+            border-color: #8BC34A;
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #ffd700;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .close-btn:hover {
+            color: #ffed4e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 5px;
+            background: #333;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            transition: width 0.3s ease;
+        }
+
+        .title-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .title-screen.hidden {
+            display: none;
+        }
+
+        .title {
+            font-size: 60px;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #ffd;
+            text-align: center;
+        }
+
+        .start-btn {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: #ffd700;
+            color: #000;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            background: #ffed4e;
+        }
+    </style>
+</head>
+<body>
+    <div class="title-screen" id="titleScreen">
+        <div class="title">💕 Jake & Galilee's Journey 💕</div>
+        <div class="subtitle">A love story told through memories, games, and moments we'll never forget</div>
+        <button class="start-btn" onclick="startJourney()">Begin the Journey</button>
+    </div>
+
+    <div class="game-container">
+        <div class="sky day" id="sky"></div>
+        <div class="ground"></div>
+        <div class="grass"></div>
+        
+        <div class="game-area">
+            <div class="characters">
+                <div class="character">
+                    <div class="character-sprite">🧑</div>
+                    <div class="character-name">Jake</div>
+                </div>
+                <div class="character">
+                    <div class="character-sprite">👩</div>
+                    <div class="character-name">Galilee</div>
+                </div>
+            </div>
+
+            <div class="stopping-point" id="stoppingPoint" onclick="arriveAtStop()">
+                <img id="stopImage" src="https://via.placeholder.com/150?text=Memory" alt="Memory Location">
+                <div class="point-label" id="stopLabel">Next Stop</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI PANEL -->
+    <div class="ui-panel" id="uiPanel" style="display: none;">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="memory-title" id="memoryTitle">Memory Title</div>
+        <div class="memory-date" id="memoryDate">Date</div>
+        <div class="memory-description" id="memoryDescription">Description</div>
+        <div class="btn-container">
+            <button onclick="playGame('current')">Play Game</button>
+            <button onclick="nextStop()" id="nextBtn">Next Stop →</button>
+        </div>
+    </div>
+
+    <!-- GAME MODAL -->
+    <div class="modal" id="gameModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeGame()">✕</button>
+            <div class="modal-title" id="gameTitle">Mini Game</div>
+            <div class="game-status" id="gameStatus"></div>
+            <div id="gameContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        const memories = [
+            {
+                id: 1,
+                title: "First Meeting",
+                date: "April 18, 2026",
+                description: "The day we first met at Hurricane Harry's. A moment that changed everything. 🌟",
+                location: "Hurricane Harry's",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%238B4513' width='200' height='200'/%3E%3Crect fill='%23A0522D' x='20' y='40' width='160' height='120'/%3E%3Crect fill='%23654321' x='50' y='80' width='40' height='60'/%3E%3C/svg%3E",
+                sky: "night",
+                game: "tic-tac-toe"
+            },
+            {
+                id: 2,
+                title: "First Date",
+                date: "April 20, 2026",
+                description: "Mini golf and laughs. You made me smile the entire time. ⛳💕",
+                location: "Pop Stroke Mini Golf",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect fill='%2390EE90' width='200' height='200'/%3E%3Ccircle cx='100' cy='100' r='20' fill='%23FFD700'/%3E%3Crect fill='%238B0000' x='80' y='120' width='40' height='30'/%3E%3C/svg%3E",
+                sky: "day",
+                game: "memory-match"
+            }
+        ];
+
+        let currentStop = 0;
+        let gameActive = false;
+        let tictactoeBoard = ['', '', '', '', '', '', '', '', ''];
+        let tictactoeIsXNext = true;
+        let memoryCards = [];
+        let memoryFlipped = [];
+        let memoryMatched = 0;
+
+        function startJourney() {
+            document.getElementById('titleScreen').classList.add('hidden');
+            loadStop(0);
+        }
+
+        function loadStop(index) {
+            if (index < 0 || index >= memories.length) return;
+            
+            currentStop = index;
+            const memory = memories[index];
+            
+            // Update sky
+            document.getElementById('sky').className = 'sky ' + memory.sky;
+            
+            // Update stopping point
+            document.getElementById('stopImage').src = memory.image;
+            document.getElementById('stopLabel').textContent = memory.location;
+            
+            // Show UI panel
+            const panel = document.getElementById('uiPanel');
+            panel.style.display = 'block';
+            document.getElementById('memoryTitle').textContent = memory.title;
+            document.getElementById('memoryDate').textContent = memory.date;
+            document.getElementById('memoryDescription').textContent = memory.description;
+            
+            // Update progress
+            const progress = ((index + 1) / memories.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            
+            // Update next button
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.disabled = index >= memories.length - 1;
+            nextBtn.textContent = index >= memories.length - 1 ? "The End 💕" : "Next Stop →";
+        }
+
+        function arriveAtStop() {
+            // Animation could go here
+            console.log('Arrived at stop ' + (currentStop + 1));
+        }
+
+        function nextStop() {
+            if (currentStop < memories.length - 1) {
+                loadStop(currentStop + 1);
+            }
+        }
+
+        function playGame(which) {
+            const memory = memories[currentStop];
+            const modal = document.getElementById('gameModal');
+            modal.classList.add('active');
+            gameActive = true;
+
+            if (memory.game === 'tic-tac-toe') {
+                playTicTacToe();
+            } else if (memory.game === 'memory-match') {
+                playMemoryMatch();
+            }
+        }
+
+        function playTicTacToe() {
+            document.getElementById('gameTitle').textContent = "Tic Tac Toe";
+            tictactoeBoard = ['', '', '', '', '', '', '', '', ''];
+            tictactoeIsXNext = true;
+            
+            let html = '<div class="game-board" id="tictactoeBoard">';
+            for (let i = 0; i < 9; i++) {
+                html += `<button class="game-cell" onclick="tictactoePlaceMark(${i})"></button>`;
+            }
+            html += '</div>';
+            html += '<div class="game-status" id="tictactoeStatus">Your turn (X)</div>';
+            
+            document.getElementById('gameContainer').innerHTML = html;
+            renderTicTacToe();
+        }
+
+        function tictactoePlaceMark(index) {
+            if (tictactoeBoard[index] === '') {
+                tictactoeBoard[index] = 'X';
+                const winner = checkTicTacToeWinner();
+                
+                if (winner) {
+                    document.getElementById('tictactoeStatus').textContent = 'You Win! 🎉';
+                    disableTicTacToe();
+                } else if (tictactoeBoard.every(cell => cell !== '')) {
+                    document.getElementById('tictactoeStatus').textContent = "It's a Draw!";
+                    disableTicTacToe();
+                } else {
+                    tictactoeAIMove();
+                }
+                
+                renderTicTacToe();
+            }
+        }
+
+        function tictactoeAIMove() {
+            const empty = tictactoeBoard
+                .map((cell, index) => cell === '' ? index : null)
+                .filter(val => val !== null);
+            
+            if (empty.length === 0) return;
+            
+            const randomIndex = empty[Math.floor(Math.random() * empty.length)];
+            tictactoeBoard[randomIndex] = 'O';
+            
+            const winner = checkTicTacToeWinner();
+            if (winner === 'O') {
+                document.getElementById('tictactoeStatus').textContent = 'AI Wins! Try again 🤖';
+                disableTicTacToe();
+            } else if (tictactoeBoard.every(cell => cell !== '')) {
+                document.getElementById('tictactoeStatus').textContent = "It's a Draw!";
+                disableTicTacToe();
+            } else {
+                document.getElementById('tictactoeStatus').textContent = 'Your turn (X)';
+            }
+        }
+
+        function checkTicTacToeWinner() {
+            const lines = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+            
+            for (let line of lines) {
+                const [a, b, c] = line;
+                if (tictactoeBoard[a] && tictactoeBoard[a] === tictactoeBoard[b] && tictactoeBoard[a] === tictactoeBoard[c]) {
+                    return tictactoeBoard[a];
+                }
+            }
+            return null;
+        }
+
+        function renderTicTacToe() {
+            const cells = document.querySelectorAll('.game-cell');
+            cells.forEach((cell, index) => {
+                cell.textContent = tictactoeBoard[index];
+                cell.disabled = tictactoeBoard[index] !== '';
+            });
+        }
+
+        function disableTicTacToe() {
+            document.querySelectorAll('.game-cell').forEach(cell => cell.disabled = true);
+        }
+
+        function playMemoryMatch() {
+            document.getElementById('gameTitle').textContent = "Memory Matching Game";
+            
+            const emojis = ['💕', '💕', '👫', '👫', '🌟', '🌟', '💑', '💑'];
+            memoryCards = emojis.sort(() => 0.5 - Math.random());
+            memoryFlipped = Array(8).fill(false);
+            memoryMatched = 0;
+            
+            let html = '<div class="memory-grid">';
+            for (let i = 0; i < memoryCards.length; i++) {
+                html += `<button class="memory-card" onclick="flipMemoryCard(${i})">?</button>`;
+            }
+            html += '</div>';
+            html += '<div class="game-status" id="memoryStatus">Match all pairs!</div>';
+            
+            document.getElementById('gameContainer').innerHTML = html;
+        }
+
+        let memoryLocked = false;
+        let flipped = [];
+
+        function flipMemoryCard(index) {
+            if (memoryLocked || flipped.length >= 2 || memoryFlipped[index]) return;
+            
+            const card = document.querySelectorAll('.memory-card')[index];
+            card.textContent = memoryCards[index];
+            card.classList.add('matched');
+            flipped.push(index);
+            
+            if (flipped.length === 2) {
+                memoryLocked = true;
+                
+                if (memoryCards[flipped[0]] === memoryCards[flipped[1]]) {
+                    memoryFlipped[flipped[0]] = true;
+                    memoryFlipped[flipped[1]] = true;
+                    memoryMatched += 2;
+                    
+                    if (memoryMatched === memoryCards.length) {
+                        document.getElementById('memoryStatus').textContent = 'You Win! 🎉';
+                    }
+                    
+                    flipped = [];
+                    memoryLocked = false;
+                } else {
+                    setTimeout(() => {
+                        document.querySelectorAll('.memory-card').forEach((c, i) => {
+                            if (!memoryFlipped[i]) {
+                                c.textContent = '?';
+                                c.classList.remove('matched');
+                            }
+                        });
+                        flipped = [];
+                        memoryLocked = false;
+                    }, 1000);
+                }
+            }
+        }
+
+        function closeGame() {
+            document.getElementById('gameModal').classList.remove('active');
+            gameActive = false;
+        }
+    </script>
+</body>
+</html>
