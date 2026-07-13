@@ -87,15 +87,15 @@
         /* CHARACTERS */
         .characters {
             display: flex;
-            gap: 30px;
+            gap: 50px;
             align-items: flex-end;
             animation: walk 3s ease-in-out infinite;
-            margin-bottom: 80px;
+            margin-bottom: 60px;
         }
 
         @keyframes walk {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
 
         .character {
@@ -106,12 +106,146 @@
         }
 
         .character-sprite {
-            width: 60px;
-            height: 80px;
+            width: 80px;
+            height: 120px;
             display: flex;
-            align-items: flex-end;
+            align-items: center;
             justify-content: center;
-            font-size: 50px;
+            position: relative;
+        }
+
+        /* Jake - Brown Hair, Male */
+        .character-sprite.jake {
+            background: none;
+        }
+
+        .jake-head {
+            width: 35px;
+            height: 40px;
+            background: #f4a460;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+        }
+
+        .jake-hair {
+            width: 40px;
+            height: 20px;
+            background: #6b4423;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: 8px;
+        }
+
+        .jake-body {
+            width: 45px;
+            height: 50px;
+            background: #ff6b9d;
+            border-radius: 8px;
+            position: absolute;
+            top: 50px;
+        }
+
+        .jake-legs {
+            width: 40px;
+            height: 30px;
+            background: #4a5568;
+            border-radius: 0 0 8px 8px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .jake-eyes {
+            width: 4px;
+            height: 4px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 22px;
+        }
+
+        .jake-eye-left {
+            left: 12px;
+        }
+
+        .jake-eye-right {
+            right: 12px;
+        }
+
+        /* Galilee - Blonde Hair, Female */
+        .character-sprite.galilee {
+            background: none;
+        }
+
+        .galilee-head {
+            width: 35px;
+            height: 40px;
+            background: #f4a460;
+            border-radius: 50%;
+            position: absolute;
+            top: 10px;
+        }
+
+        .galilee-hair {
+            width: 42px;
+            height: 25px;
+            background: #ffd700;
+            border-radius: 50% 50% 20% 20%;
+            position: absolute;
+            top: 5px;
+        }
+
+        .galilee-hair-long {
+            width: 8px;
+            height: 30px;
+            background: #ffd700;
+            position: absolute;
+            top: 30px;
+        }
+
+        .galilee-hair-left {
+            left: 6px;
+            border-radius: 0 0 8px 0;
+        }
+
+        .galilee-hair-right {
+            right: 6px;
+            border-radius: 0 0 0 8px;
+        }
+
+        .galilee-body {
+            width: 45px;
+            height: 50px;
+            background: #ff69b4;
+            border-radius: 8px;
+            position: absolute;
+            top: 50px;
+        }
+
+        .galilee-legs {
+            width: 40px;
+            height: 30px;
+            background: #d4a5d4;
+            border-radius: 0 0 8px 8px;
+            position: absolute;
+            bottom: 0;
+        }
+
+        .galilee-eyes {
+            width: 4px;
+            height: 4px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 22px;
+        }
+
+        .galilee-eye-left {
+            left: 12px;
+        }
+
+        .galilee-eye-right {
+            right: 12px;
         }
 
         .character-name {
@@ -119,6 +253,7 @@
             font-weight: bold;
             color: white;
             text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+            margin-top: 10px;
         }
 
         /* STOPPING POINT */
@@ -412,12 +547,33 @@
         
         <div class="game-area">
             <div class="characters">
+                <!-- Jake with brown hair -->
                 <div class="character">
-                    <div class="character-sprite">🧑</div>
+                    <div class="character-sprite jake">
+                        <div class="jake-hair"></div>
+                        <div class="jake-head">
+                            <div class="jake-eyes jake-eye-left"></div>
+                            <div class="jake-eyes jake-eye-right"></div>
+                        </div>
+                        <div class="jake-body"></div>
+                        <div class="jake-legs"></div>
+                    </div>
                     <div class="character-name">Jake</div>
                 </div>
+
+                <!-- Galilee with blonde hair -->
                 <div class="character">
-                    <div class="character-sprite">👩</div>
+                    <div class="character-sprite galilee">
+                        <div class="galilee-hair"></div>
+                        <div class="galilee-hair-long galilee-hair-left"></div>
+                        <div class="galilee-hair-long galilee-hair-right"></div>
+                        <div class="galilee-head">
+                            <div class="galilee-eyes galilee-eye-left"></div>
+                            <div class="galilee-eyes galilee-eye-right"></div>
+                        </div>
+                        <div class="galilee-body"></div>
+                        <div class="galilee-legs"></div>
+                    </div>
                     <div class="character-name">Galilee</div>
                 </div>
             </div>
